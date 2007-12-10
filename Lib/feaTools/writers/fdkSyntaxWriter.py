@@ -119,12 +119,17 @@ class FDKSyntaxFeatureWriter(AbstractFeatureWriter):
         self._instructions.append(t)
 
     def gposType2(self, target, value):
+        needEnum = False
         left, right = target
         if isinstance(left, list):
-            left = self._list2String(left)
+            left = "[%s]" % self._list2String(left)
+            needEnum = True
         if isinstance(right, list):
-            right = self._list2String(right)
+            right = "[%s]" % self._list2String(right)
+            needEnum = True
         t = "pos %s %s %d;" % (left, right, value)
+        if needEnum:
+            t = "enum %s" % t
         self._instructions.append(t)
 
     def languageSystem(self, languageTag, scriptTag):
