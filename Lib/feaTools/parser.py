@@ -1,6 +1,14 @@
 import re
 
-DEBUG = False
+
+class FeaToolsParserSyntaxError(Exception):
+
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
+
 
 # used for removing all comments
 commentRE = re.compile("#.*")
@@ -133,7 +141,8 @@ posType1RE = re.compile(
 # used for finding positioning type 2
 posType2RE = re.compile(
     "([\s;\{\}]|^)"        # whitepace, ; {, } or start of line
-    "position|pos\s+"      # pos
+    "(enum\s+|\s*)"        # enum
+    "(position|pos\s+)"    # pos
     "([-\w\d\s_.@\[\]]+)"  # left, right, value
     "\s*;"                 # ;
     )
@@ -244,7 +253,7 @@ def _parseUnknown(writer, text):
         _parsePosType1(writer, target, value)
     # pos type 2
     posType2s = posType2RE.findall(text)
-    for precedingMark, targetAndValue in posType2s:
+    for precedingMark, enumTag, posTag, targetAndValue in posType2s:
         text = _executeSimpleSlice(precedingMark, text, posType2RE, writer)
         _parsePosType2(writer, targetAndValue)
     ## extract other data
@@ -273,10 +282,9 @@ def _parseUnknown(writer, text):
     for precedingMark, path in inclusions:
         text = _executeSimpleSlice(precedingMark, text, includeRE, writer)
         writer.include(path)
-    if DEBUG:
-        text = text.strip()
-        if text:
-            print ">>> unknown >>>", text
+    text = text.strip()
+    if text:
+        raise FeaToolsParserSyntaxError("Invalid Syntax: %s" % text)
 
 def _executeSimpleSlice(precedingMark, text, regex, writer):
     first = regex.search(text)
@@ -378,6 +386,16 @@ def _parsePosType1(writer, target, value):
     writer.gposType1(target, value)
 
 def _parsePosType2(writer, targetAndValue):
+    # the target and value will be coming
+    # in as single string.
+    target = " ".join(targetAndValue.split(" ")[:-1])
+    value = targetAndValue.split(" ")[-1]
+    # XXX this could cause a choke
+    value = float(value)
+    target = _parseSequence(target)
+    writer.gposType2(target, value)
+
+def _parsePosType2WithEnum(writer, targetAndValue):
     # the target and value will be coming
     # in as single string.
     target = " ".join(targetAndValue.split(" ")[:-1])
