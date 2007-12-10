@@ -138,7 +138,7 @@ class TestRead(unittest.TestCase):
                 ("feature", ("test", [
                 ("lookup", ("TEST", []))
                 ]))]
-        self.assertEqual(result, None)
+        self.assertEqual(result, expected)
         #
         test = """
         feature test {
@@ -477,6 +477,15 @@ class TestRead(unittest.TestCase):
         result = writer.getData()
         expected = [
                 ("gpos type 2", (["foo", "bar"], -100.0))
+                ]
+        self.assertEqual(result, expected)
+        #
+        test = """enum pos foo [bar bar.alt] -100;"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("gpos type 2", (["foo", ["bar", "bar.alt"]], -100.0))
                 ]
         self.assertEqual(result, expected)
         #
