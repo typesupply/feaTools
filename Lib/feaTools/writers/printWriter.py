@@ -48,3 +48,5 @@ class PrintFeatureWriter(AbstractFeatureWriter):
     def include(self, path):
         print ("include", (path))
 
+    def subtableBreak(self):
+        print "subtable break"

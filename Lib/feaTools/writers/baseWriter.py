@@ -39,3 +39,5 @@ class AbstractFeatureWriter(object):
     def include(self, path):
         raise NotImplementedError
 
+    def subtableBreak(self):
+        raise NotImplementedError

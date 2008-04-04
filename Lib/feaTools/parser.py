@@ -185,6 +185,13 @@ includeRE = re.compile(
         "\s*;{0,1}"            # ; which will occur zero or one times (ugh!)
         )
 
+# used for finding subtable breaks
+subtableRE = re.compile(
+    "([\s;\{\}]|^)"        # whitepace, ; {, } or start of line
+    "subtable\s*"          # subtable
+    "\s*;"                 # ;
+)
+
 def _parseUnknown(writer, text):
     text = text.strip()
     ## extract all feature names
@@ -282,6 +289,11 @@ def _parseUnknown(writer, text):
     for precedingMark, path in inclusions:
         text = _executeSimpleSlice(precedingMark, text, includeRE, writer)
         writer.include(path)
+    # subtable
+    subtables = subtableRE.findall(text)
+    for precedingMark in subtables:
+        text = _executeSimpleSlice(precedingMark, text, subtableRE, writer)
+        writer.subtableBreak()
     text = text.strip()
     if text:
         raise FeaToolsParserSyntaxError("Invalid Syntax: %s" % text)
