@@ -65,6 +65,10 @@ class FDKSyntaxFeatureWriter(AbstractFeatureWriter):
         self._instructions.append(lookup)
         return lookup
 
+    def lookupReference(self, name):
+        t = "lookup %s;" % name
+        self._instructions.append(t)
+
     def classDefinition(self, name, contents):
         t = "%s = [%s];" % (name, self._list2String(contents))
         self._instructions.append(t)
@@ -93,24 +97,34 @@ class FDKSyntaxFeatureWriter(AbstractFeatureWriter):
         t = "sub %s by %s;" % (target, replacement)
         self._instructions.append(t)
 
-    def gsubType6(self, precedingContext, target, trailingContext, replacement):
+    def gsubType6(self, precedingContext, target, trailingContext, replacement, ignore=False):
         if isinstance(precedingContext, list):
             precedingContext = self._list2String(precedingContext)
         if isinstance(target, list):
-            target = [i + "'" for i in target]
             target = self._list2String(target)
+        target += "'"
         if isinstance(trailingContext, list):
             trailingContext = self._list2String(trailingContext)
         if isinstance(replacement, list):
             replacement = self._list2String(replacement)
-        if precedingContext and trailingContext:
-            t = "sub %s %s %s by %s;" % (precedingContext, target, trailingContext, replacement)
-        elif precedingContext:
-            t = "sub %s %s by %s;" % (precedingContext, target, replacement)
-        elif trailingContext:
-            t = "sub %s %s by %s;" % (target, trailingContext, replacement)
+        if ignore:
+            if precedingContext and trailingContext:
+                t = "ignore sub %s %s %s;" % (precedingContext, target, trailingContext)
+            elif precedingContext:
+                t = "ignore sub %s %s;" % (precedingContext, target)
+            elif trailingContext:
+                t = "ignore sub %s %s;" % (target, trailingContext)
+            else:
+                t = "ignore sub %s;" % target
         else:
-            t = "sub %s by %s;" % (target, replacement)
+            if precedingContext and trailingContext:
+                t = "sub %s %s %s by %s;" % (precedingContext, target, trailingContext, replacement)
+            elif precedingContext:
+                t = "sub %s %s by %s;" % (precedingContext, target, replacement)
+            elif trailingContext:
+                t = "sub %s %s by %s;" % (target, trailingContext, replacement)
+            else:
+                t = "sub %s by %s;" % (target, replacement)
         self._instructions.append(t)
 
     def gposType1(self, target, value):
@@ -133,7 +147,7 @@ class FDKSyntaxFeatureWriter(AbstractFeatureWriter):
         self._instructions.append(t)
 
     def languageSystem(self, languageTag, scriptTag):
-        t = "languagesystem %s %s;" % (languageTag, scriptTag)
+        t = "languagesystem %s %s;" % (scriptTag, languageTag)
         self._instructions.append(t)
 
     def script(self, scriptTag):
@@ -150,3 +164,8 @@ class FDKSyntaxFeatureWriter(AbstractFeatureWriter):
     def include(self, path):
         t = "include(%s)" % path
         self._instructions.append(t)
+
+    def subtableBreak(self):
+        t = "subtable;"
+        self._instructions.append(t)
+
