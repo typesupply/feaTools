@@ -1,49 +1,49 @@
 class AbstractFeatureWriter(object):
 
     def feature(self, name):
-        raise NotImplementedError
+        return self
 
     def lookup(self, name):
-        raise NotImplementedError
+        return self
 
     def featureReference(self, name):
-        raise NotImplementedError
+        pass
 
     def lookupReference(self, name):
-        raise NotImplementedError
+        pass
 
     def classDefinition(self, name, contents):
-        raise NotImplementedError
+        pass
 
     def gsubType1(self, target, replacement):
-        raise NotImplementedError
+        pass
 
     def gsubType3(self, target, replacement):
-        raise NotImplementedError
+        pass
 
     def gsubType4(self, target, replacement):
-        raise NotImplementedError
+        pass
 
     def gsubType6(self, precedingContext, target, trailingContext, replacement):
-        raise NotImplementedError
+        pass
 
     def gposType1(self, target, value):
-        raise NotImplementedError
+        pass
 
     def gposType2(self, target, value):
-        raise NotImplementedError
+        pass
 
     def languageSystem(self, languageTag, scriptTag):
-        raise NotImplementedError
+        pass
 
     def script(self, scriptTag):
-        raise NotImplementedError
+        pass
 
     def language(self, languageTag, includeDefault=True):
-        raise NotImplementedError
+        pass
 
     def include(self, path):
-        raise NotImplementedError
+        pass
 
     def subtableBreak(self):
-        raise NotImplementedError
+        pass
