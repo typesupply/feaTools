@@ -487,7 +487,7 @@ def _parseSubType6(writer, target, replacement=None, ignore=False):
         extractedTargets.append(target)
         counter += 1
         targetText = targetText[end:]
-    writer.gsubType6(precedingContext, extractedTargets, trailingContext, replacement, ignore=ignore)
+    writer.gsubType6(precedingContext, extractedTargets, trailingContext, replacement)
 
 def _parsePosType1(writer, target, value):
     # target will only be one item representing

@@ -97,7 +97,7 @@ class FDKSyntaxFeatureWriter(AbstractFeatureWriter):
         t = "sub %s by %s;" % (target, replacement)
         self._instructions.append(t)
 
-    def gsubType6(self, precedingContext, target, trailingContext, replacement, ignore=False):
+    def gsubType6(self, precedingContext, target, trailingContext, replacement):
         if isinstance(precedingContext, list):
             precedingContext = self._list2String(precedingContext)
         if isinstance(target, list):
@@ -107,7 +107,8 @@ class FDKSyntaxFeatureWriter(AbstractFeatureWriter):
             trailingContext = self._list2String(trailingContext)
         if isinstance(replacement, list):
             replacement = self._list2String(replacement)
-        if ignore:
+        # if the replacement is None, this is an "ignore"
+        if replacement is None:
             if precedingContext and trailingContext:
                 t = "ignore sub %s %s %s;" % (precedingContext, target, trailingContext)
             elif precedingContext:
@@ -116,6 +117,7 @@ class FDKSyntaxFeatureWriter(AbstractFeatureWriter):
                 t = "ignore sub %s %s;" % (target, trailingContext)
             else:
                 t = "ignore sub %s;" % target
+        # otherwise it is a regular substitution
         else:
             if precedingContext and trailingContext:
                 t = "sub %s %s %s by %s;" % (precedingContext, target, trailingContext, replacement)

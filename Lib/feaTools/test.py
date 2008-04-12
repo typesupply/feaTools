@@ -39,8 +39,8 @@ class TestFeatureWriter(AbstractFeatureWriter):
     def gsubType4(self, target, replacement):
         self._instructions.append(("gsub type 4", (target, replacement)))
 
-    def gsubType6(self, precedingContext, target, trailingContext, replacement, ignore=False):
-        self._instructions.append(("gsub type 6", (precedingContext, target, trailingContext, replacement, ignore)))
+    def gsubType6(self, precedingContext, target, trailingContext, replacement):
+        self._instructions.append(("gsub type 6", (precedingContext, target, trailingContext, replacement)))
 
     def gposType1(self, target, value):
         self._instructions.append(("gpos type 1", (target, value)))
@@ -438,7 +438,7 @@ class TestRead(unittest.TestCase):
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("gsub type 6", (["f"], ["o"], [], "o.alt", False))
+                ("gsub type 6", (["f"], ["o"], [], "o.alt"))
                 ]
         self.assertEqual(result, expected)
         #
@@ -447,7 +447,7 @@ class TestRead(unittest.TestCase):
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("gsub type 6", (["f"], ["o"], ["o"], "o.alt", False))
+                ("gsub type 6", (["f"], ["o"], ["o"], "o.alt"))
                 ]
         self.assertEqual(result, expected)
         #
@@ -456,7 +456,7 @@ class TestRead(unittest.TestCase):
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("gsub type 6", (["f"], ["o", "o"], [], "o_o.alt", False))
+                ("gsub type 6", (["f"], ["o", "o"], [], "o_o.alt"))
                 ]
         self.assertEqual(result, expected)
         #
@@ -465,7 +465,7 @@ class TestRead(unittest.TestCase):
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("gsub type 6", (["f"], ["o", "o"], ["b"], "o_o.alt", False))
+                ("gsub type 6", (["f"], ["o", "o"], ["b"], "o_o.alt"))
                 ]
         self.assertEqual(result, expected)
         #
@@ -475,7 +475,7 @@ class TestRead(unittest.TestCase):
         #parseFeatures(writer, test)
         #result = writer.getData()
         #expected = [
-        #        ("gsub type 6", ([["f"]], [["o"]], [["o"]], "o.alt", False))
+        #        ("gsub type 6", ([["f"]], [["o"]], [["o"]], "o.alt"))
         #        ]
         #self.assertEqual(result, expected)
         ##
@@ -485,7 +485,7 @@ class TestRead(unittest.TestCase):
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("gsub type 6", ([], [["foo", "bar"]], ["bar"], ["foo.alt", "bar.alt"], False))
+                ("gsub type 6", ([], [["foo", "bar"]], ["bar"], ["foo.alt", "bar.alt"]))
                 ]
         self.assertEqual(result, expected)
 
@@ -496,7 +496,7 @@ class TestRead(unittest.TestCase):
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("gsub type 6", (["f"], ["o"], [], None, True))
+                ("gsub type 6", (["f"], ["o"], [], None))
                 ]
         self.assertEqual(result, expected)
         #
@@ -505,7 +505,7 @@ class TestRead(unittest.TestCase):
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("gsub type 6", (["f"], ["o"], ["o"], None, True))
+                ("gsub type 6", (["f"], ["o"], ["o"], None))
                 ]
         self.assertEqual(result, expected)
         #
@@ -514,7 +514,7 @@ class TestRead(unittest.TestCase):
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("gsub type 6", (["f"], ["o", "o"], [], None, True))
+                ("gsub type 6", (["f"], ["o", "o"], [], None))
                 ]
         self.assertEqual(result, expected)
         #
@@ -523,7 +523,7 @@ class TestRead(unittest.TestCase):
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("gsub type 6", (["f"], ["o", "o"], ["b"], None, True))
+                ("gsub type 6", (["f"], ["o", "o"], ["b"], None))
                 ]
         self.assertEqual(result, expected)
         #
@@ -532,7 +532,7 @@ class TestRead(unittest.TestCase):
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("gsub type 6", ([], [["foo", "bar"]], ["bar"], None, True))
+                ("gsub type 6", ([], [["foo", "bar"]], ["bar"], None))
                 ]
         self.assertEqual(result, expected)
 
