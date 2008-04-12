@@ -57,6 +57,3 @@ class GlyphRenameFeatureWriter(FDKSyntaxFeatureWriter):
     def gposType2(self, target, value):
         target = self._rename(target)
         super(GlyphRenameFeatureWriter, self).gposType2(target, value)
-
-    def subtableBreak(self):
-        pass

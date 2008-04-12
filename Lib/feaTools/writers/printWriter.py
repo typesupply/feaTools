@@ -15,6 +15,12 @@ class PrintFeatureWriter(AbstractFeatureWriter):
         print ("lookup", name)
         return self
 
+    def featureReference(self, name):
+        print ("featureReference", name)
+
+    def lookupReference(self, name):
+        print ("lookupReference", name)
+
     def classDefinition(self, name, contents):
         print ("class", (name, contents))
 

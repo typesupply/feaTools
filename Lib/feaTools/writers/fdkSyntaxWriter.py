@@ -65,6 +65,10 @@ class FDKSyntaxFeatureWriter(AbstractFeatureWriter):
         self._instructions.append(lookup)
         return lookup
 
+    def featureReference(self, name):
+        t = "feature %s;" % name
+        self._instructions.append(t)
+
     def lookupReference(self, name):
         t = "lookup %s;" % name
         self._instructions.append(t)
