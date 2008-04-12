@@ -60,6 +60,15 @@ class TestFeatureWriter(AbstractFeatureWriter):
     def include(self, path):
         self._instructions.append(("include", (path)))
 
+    def subtableBreak(self):
+        self._instructions.append(("subtableBreak", None))
+
+    def lookupReference(self, name):
+        self._instructions.append(("lookupReference", name))
+
+    def featureReference(self, name):
+        self._instructions.append(("featureReference", name))
+
 
 class TestRead(unittest.TestCase):
 
@@ -575,6 +584,60 @@ class TestRead(unittest.TestCase):
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [("gpos type 2", (["include", "bar"], 100.0))]
+        self.assertEqual(result, expected)
+
+    def testSubtableBreak(self):
+        test = """subtable;"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("subtableBreak", None)
+                ]
+        self.assertEqual(result, expected)
+        #
+        test = """subtable;subtable;"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("subtableBreak", None),
+                ("subtableBreak", None)
+                ]
+        self.assertEqual(result, expected)
+
+    def testFeatureReference(self):
+        test = """feature fooo;"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("featureReference", "fooo")
+                ]
+        self.assertEqual(result, expected)
+        #
+        test = """feature barr {feature fooo;} barr;"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [("feature", ("barr", [("featureReference", "fooo")]))]
+        self.assertEqual(result, expected)
+
+    def testLookupReference(self):
+        test = """lookup foo;"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("lookupReference", "foo")
+                ]
+        self.assertEqual(result, expected)
+        #
+        test = """lookup bar {lookup foo;} bar;"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [("lookup", ("bar", [("lookupReference", "foo")]))]
         self.assertEqual(result, expected)
 
 

@@ -6,6 +6,12 @@ class AbstractFeatureWriter(object):
     def lookup(self, name):
         raise NotImplementedError
 
+    def featureReference(self, name):
+        raise NotImplementedError
+
+    def lookupReference(self, name):
+        raise NotImplementedError
+
     def classDefinition(self, name, contents):
         raise NotImplementedError
 

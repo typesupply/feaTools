@@ -192,6 +192,24 @@ subtableRE = re.compile(
     "\s*;"                 # ;
 )
 
+# used for finding feature references
+featureReferenceRE = re.compile(
+        "([\s;\{\}]|^)"        # whitepace, ; {, } or start of line
+        "feature\s+"           # feature
+        "([\w\d]{4})"          # name
+        "\s*;"                 # {
+        )
+
+# used for finding lookup references
+lookupReferenceRE = re.compile(
+        "([\s;\{\}]|^)"        # whitepace, ; {, } or start of line
+        "lookup\s+"            # lookup
+        "([\w\d]+)"            # name
+        "\s*;"                 # {
+        )
+
+
+
 def _parseUnknown(writer, text):
     text = text.strip()
     ## extract all feature names
@@ -289,6 +307,16 @@ def _parseUnknown(writer, text):
     for precedingMark, path in inclusions:
         text = _executeSimpleSlice(precedingMark, text, includeRE, writer)
         writer.include(path)
+    # feature reference
+    featureReferences = featureReferenceRE.findall(text)
+    for precedingMark, featureName in featureReferences:
+        text = _executeSimpleSlice(precedingMark, text, featureReferenceRE, writer)
+        writer.featureReference(featureName)
+    # lookup reference
+    lookupReferences = lookupReferenceRE.findall(text)
+    for precedingMark, lookupName in lookupReferences:
+        text = _executeSimpleSlice(precedingMark, text, lookupReferenceRE, writer)
+        writer.lookupReference(lookupName)
     # subtable
     subtables = subtableRE.findall(text)
     for precedingMark in subtables:
