@@ -189,6 +189,48 @@ class TestRead(unittest.TestCase):
                 ]))]
         self.assertEqual(result, expected)
 
+    def testTableBlocks(self):
+        test = """
+        table test {
+        } test;
+        """
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = []
+        self.assertEqual(result, expected)
+        #
+        test = """
+        table test{}test;
+        """
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = []
+        self.assertEqual(result, expected)
+        #
+        test = """
+        table test {
+            lookup TEST {} TEST;
+        } test;
+        """
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = []
+        self.assertEqual(result, expected)
+        #
+        test = """
+        table test {
+            feature TEST {} TEST;
+        } test;
+        """
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = []
+        self.assertEqual(result, expected)
+
     def testGSUBType1(self):
         test = """sub foo by bar;"""
         writer = TestFeatureWriter()

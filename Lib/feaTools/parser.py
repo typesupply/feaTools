@@ -67,6 +67,28 @@ lookupContentRE = [
         "\s*;"                 # ;
         ]
 
+# used for finding all table names.
+table_findAll_RE = re.compile(
+        "([\s;\{\}]|^)"        # whitepace, ; {, } or start of line
+        "table\s+"             # table
+        "([\w\d]{4})"          # name
+        "\s*{"                 # {
+        )
+
+# used for finding the content of tables.
+# this regular expression will be compiled
+# for each table name found.
+tableContentRE = [
+        "([\s;\{\}]|^)",       # whitepace, ; {, } or start of line
+        "table\s+",            # feature
+        # table name           # name
+        "\s*\{",               # {
+        "([\S\s]*)",           # content
+        "}\s*",                # }
+        # table name           # name
+        "\s*;"                 # ;
+        ]
+
 # used for finding all class definitions.
 classDefinitionRE = re.compile(
         "([\s;\{\}]|^)"        # whitepace, ; {, } or start of line
@@ -219,6 +241,24 @@ lookupReferenceRE = re.compile(
 
 def _parseUnknown(writer, text):
     text = text.strip()
+    ## extract all table names
+    tableNames = table_findAll_RE.findall(text)
+    for precedingMark, tableName in tableNames:
+        # a regular expression specific to this lookup must
+        # be created so that nested lookups are safely handled
+        thisTableContentRE = list(tableContentRE)
+        thisTableContentRE.insert(2, tableName)
+        thisTableContentRE.insert(6, tableName)
+        thisTableContentRE = re.compile("".join(thisTableContentRE))
+        found = thisTableContentRE.search(text)
+        tableText = found.group(2)
+        start, end = found.span()
+        precedingText = text[:start]
+        if precedingMark:
+            precedingText += precedingMark
+        _parseUnknown(writer, precedingText)
+        _parseTable(writer, tableName, tableText)
+        text = text[end:]
     ## extract all feature names
     featureNames = feature_findAll_RE.findall(text)
     for precedingMark, featureName in featureNames:
@@ -350,6 +390,11 @@ def _parseFeature(writer, name, feature):
 def _parseLookup(writer, name, lookup):
     lookupWriter = writer.lookup(name)
     parsed = _parseUnknown(lookupWriter, lookup)
+
+def _parseTable(writer, name, table):
+    # this could parse table secific data.
+    # for now, simply ignore the text.
+    pass
 
 def _parseClass(writer, name, content):
     content = classContentRE.findall(content)
