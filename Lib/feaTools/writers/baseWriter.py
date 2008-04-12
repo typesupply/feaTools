@@ -15,6 +15,9 @@ class AbstractFeatureWriter(object):
     def classDefinition(self, name, contents):
         pass
 
+    def lookupFlag(self, rightToLeft=False, ignoreBaseGlyphs=False, ignoreLigatures=False, ignoreMarks=False):
+        pass
+
     def gsubType1(self, target, replacement):
         pass
 

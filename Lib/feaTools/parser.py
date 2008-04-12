@@ -245,7 +245,13 @@ lookupReferenceRE = re.compile(
         "\s*;"                 # {
         )
 
-
+# use for finding all lookup flags
+lookupflagRE = re.compile(
+        "([\s;\{\}]|^)"        # whitepace, ; {, } or start of line
+        "lookupflag\s+"        # lookupflag
+        "([\w\d,\s]+)"         # values
+        "\s*;"                 # ;
+        )
 
 def _parseUnknown(writer, text):
     text = text.strip()
@@ -377,7 +383,12 @@ def _parseUnknown(writer, text):
     for precedingMark, lookupName in lookupReferences:
         text = _executeSimpleSlice(precedingMark, text, lookupReferenceRE, writer)
         writer.lookupReference(lookupName)
-    # subtable
+    # lookupflag
+    lookupflags = lookupflagRE.findall(text)
+    for precedingMark, lookupflagValues in lookupflags:
+        text = _executeSimpleSlice(precedingMark, text, lookupflagRE, writer)
+        _parseLookupFlag(writer, lookupflagValues)
+    # subtable break
     subtables = subtableRE.findall(text)
     for precedingMark in subtables:
         text = _executeSimpleSlice(precedingMark, text, subtableRE, writer)
@@ -514,6 +525,38 @@ def _parsePosType2WithEnum(writer, targetAndValue):
     value = float(value)
     target = _parseSequence(target)
     writer.gposType2(target, value)
+
+def _parseLookupFlag(writer, values):
+    values = values.replace(",", " ")
+    values = [i for i in values.split(" ") if i]
+    # lookupflag format B is not supported except for value 0
+    if len(values) == 1:
+        try:
+            v = int(values[0])
+            if v != 0:
+                raise FeaToolsParserSyntaxError("lookupflag format B is not supported for any value other than 0")
+            else:
+                writer.lookupFlag()
+                return
+        except ValueError:
+            pass
+    rightToLeft = False
+    ignoreBaseGlyphs = False
+    ignoreLigatures = False
+    ignoreMarks = False
+    possibleValues = ["RightToLeft", "IgnoreBaseGlyphs", "IgnoreLigatures", "IgnoreMarks"]
+    for value in values:
+        if value not in possibleValues:
+            raise FeaToolsParserSyntaxError("Unknown lookupflag value: %s" % value)
+        if value == "RightToLeft":
+            rightToLeft = True
+        elif value == "IgnoreBaseGlyphs":
+            ignoreBaseGlyphs = True
+        elif value == "IgnoreLigatures":
+            ignoreLigatures = True
+        elif value == "IgnoreMarks":
+            ignoreMarks = True
+    writer.lookupFlag(rightToLeft=rightToLeft, ignoreBaseGlyphs=ignoreBaseGlyphs, ignoreLigatures=ignoreLigatures, ignoreMarks=ignoreMarks)
 
 def parseFeatures(writer, text):
     # strip the strings.

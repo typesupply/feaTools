@@ -30,6 +30,9 @@ class TestFeatureWriter(AbstractFeatureWriter):
     def classDefinition(self, name, contents):
         self._instructions.append(("class", (name, contents)))
 
+    def lookupFlag(self, rightToLeft=False, ignoreBaseGlyphs=False, ignoreLigatures=False, ignoreMarks=False):
+        self._instructions.append(("lookup flag", (rightToLeft, ignoreBaseGlyphs, ignoreLigatures, ignoreMarks)))
+
     def gsubType1(self, target, replacement):
         self._instructions.append(("gsub type 1", (target, replacement)))
 
@@ -61,13 +64,13 @@ class TestFeatureWriter(AbstractFeatureWriter):
         self._instructions.append(("include", (path)))
 
     def subtableBreak(self):
-        self._instructions.append(("subtableBreak", None))
+        self._instructions.append(("subtable break", None))
 
     def lookupReference(self, name):
-        self._instructions.append(("lookupReference", name))
+        self._instructions.append(("lookup reference", name))
 
     def featureReference(self, name):
-        self._instructions.append(("featureReference", name))
+        self._instructions.append(("feature reference", name))
 
 
 class TestRead(unittest.TestCase):
@@ -229,6 +232,61 @@ class TestRead(unittest.TestCase):
         parseFeatures(writer, test)
         result = writer.getData()
         expected = []
+        self.assertEqual(result, expected)
+
+    def testLookupFlag(self):
+        test = """lookupflag RightToLeft;"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("lookup flag", (True, False, False, False))
+                ]
+        self.assertEqual(result, expected)
+        #
+        test = """lookupflag IgnoreBaseGlyphs;"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("lookup flag", (False, True, False, False))
+                ]
+        self.assertEqual(result, expected)
+        #
+        test = """lookupflag IgnoreLigatures;"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("lookup flag", (False, False, True, False))
+                ]
+        self.assertEqual(result, expected)
+        #
+        test = """lookupflag IgnoreMarks;"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("lookup flag", (False, False, False, True))
+                ]
+        self.assertEqual(result, expected)
+        #
+        test = """lookupflag RightToLeft, IgnoreBaseGlyphs, IgnoreLigatures, IgnoreMarks;"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("lookup flag", (True, True, True, True))
+                ]
+        self.assertEqual(result, expected)
+        #
+        test = """lookupflag 0;"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("lookup flag", (False, False, False, False))
+                ]
         self.assertEqual(result, expected)
 
     def testGSUBType1(self):
@@ -690,7 +748,7 @@ class TestRead(unittest.TestCase):
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("subtableBreak", None)
+                ("subtable break", None)
                 ]
         self.assertEqual(result, expected)
         #
@@ -699,8 +757,8 @@ class TestRead(unittest.TestCase):
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("subtableBreak", None),
-                ("subtableBreak", None)
+                ("subtable break", None),
+                ("subtable break", None)
                 ]
         self.assertEqual(result, expected)
 
@@ -710,7 +768,7 @@ class TestRead(unittest.TestCase):
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("featureReference", "test")
+                ("feature reference", "test")
                 ]
         self.assertEqual(result, expected)
         #
@@ -718,7 +776,7 @@ class TestRead(unittest.TestCase):
         writer = TestFeatureWriter()
         parseFeatures(writer, test)
         result = writer.getData()
-        expected = [("feature", ("TEST", [("featureReference", "test")]))]
+        expected = [("feature", ("TEST", [("feature reference", "test")]))]
         self.assertEqual(result, expected)
 
     def testLookupReference(self):
@@ -727,7 +785,7 @@ class TestRead(unittest.TestCase):
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("lookupReference", "test")
+                ("lookup reference", "test")
                 ]
         self.assertEqual(result, expected)
         #
@@ -735,7 +793,7 @@ class TestRead(unittest.TestCase):
         writer = TestFeatureWriter()
         parseFeatures(writer, test)
         result = writer.getData()
-        expected = [("lookup", ("TEST", [("lookupReference", "test")]))]
+        expected = [("lookup", ("TEST", [("lookup reference", "test")]))]
         self.assertEqual(result, expected)
 
 

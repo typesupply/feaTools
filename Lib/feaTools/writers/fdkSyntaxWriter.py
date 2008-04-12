@@ -77,6 +77,22 @@ class FDKSyntaxFeatureWriter(AbstractFeatureWriter):
         t = "%s = [%s];" % (name, self._list2String(contents))
         self._instructions.append(t)
 
+    def lookupFlag(self, rightToLeft=False, ignoreBaseGlyphs=False, ignoreLigatures=False, ignoreMarks=False):
+        values = []
+        if rightToLeft:
+            values.append("RightToLeft")
+        if ignoreBaseGlyphs:
+            values.append("IgnoreBaseGlyphs")
+        if ignoreLigatures:
+            values.append("IgnoreLigatures")
+        if ignoreMarks:
+            values.append("IgnoreMarks")
+        if not values:
+            values = "0"
+        values = ", ".join(values)
+        t = "lookupflag %s;" % values
+        self._instructions.append(t)
+
     def gsubType1(self, target, replacement):
         if isinstance(target, list):
             target = "[%s]" % self._list2String(target)
