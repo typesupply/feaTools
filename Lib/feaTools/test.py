@@ -72,6 +72,16 @@ class TestFeatureWriter(AbstractFeatureWriter):
 
 class TestRead(unittest.TestCase):
 
+    def testStrings(self):
+        test = """
+            "feature test { sub foo by bar; } test;"
+        """
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = []
+        self.assertEqual(result, expected)
+
     def testFeatureBlocks(self):
         test = """
         feature test {
@@ -607,37 +617,37 @@ class TestRead(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def testFeatureReference(self):
-        test = """feature fooo;"""
+        test = """feature test;"""
         writer = TestFeatureWriter()
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("featureReference", "fooo")
+                ("featureReference", "test")
                 ]
         self.assertEqual(result, expected)
         #
-        test = """feature barr {feature fooo;} barr;"""
+        test = """feature TEST {feature test;} TEST;"""
         writer = TestFeatureWriter()
         parseFeatures(writer, test)
         result = writer.getData()
-        expected = [("feature", ("barr", [("featureReference", "fooo")]))]
+        expected = [("feature", ("TEST", [("featureReference", "test")]))]
         self.assertEqual(result, expected)
 
     def testLookupReference(self):
-        test = """lookup foo;"""
+        test = """lookup test;"""
         writer = TestFeatureWriter()
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("lookupReference", "foo")
+                ("lookupReference", "test")
                 ]
         self.assertEqual(result, expected)
         #
-        test = """lookup bar {lookup foo;} bar;"""
+        test = """lookup TEST {lookup test;} TEST;"""
         writer = TestFeatureWriter()
         parseFeatures(writer, test)
         result = writer.getData()
-        expected = [("lookup", ("bar", [("lookupReference", "foo")]))]
+        expected = [("lookup", ("TEST", [("lookupReference", "test")]))]
         self.assertEqual(result, expected)
 
 

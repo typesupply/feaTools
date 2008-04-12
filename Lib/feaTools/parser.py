@@ -13,6 +13,13 @@ class FeaToolsParserSyntaxError(Exception):
 # used for removing all comments
 commentRE = re.compile("#.*")
 
+# used for finding all strings
+stringRE = re.compile(
+    "\""         # "
+    "([^\"]*)"   # anything but "
+    "\""         # "
+)
+
 # used for removing all comments
 terminatorRE = re.compile(";")
 
@@ -135,7 +142,7 @@ posType1RE = re.compile(
     "([\w\d\s_.@\[\]]+)"   # target
     "\s+<"                 # <
     "([-\d\s]+)"           # value
-    "\s*>\s*;"             # >;        
+    "\s*>\s*;"             # >;
     )
 
 # used for finding positioning type 2
@@ -446,6 +453,11 @@ def _parsePosType2WithEnum(writer, targetAndValue):
     writer.gposType2(target, value)
 
 def parseFeatures(writer, text):
+    # strip the strings.
+    # (an alternative approach would be to escape the strings.
+    # the problem is that a string could contain parsable text
+    # that would fool the parsing algorithm.)
+    text = stringRE.sub("", text)
     # strip the comments
     text = commentRE.sub("", text)
     # make sure there is a space after all ;
