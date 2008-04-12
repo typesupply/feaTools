@@ -39,12 +39,12 @@ class TestFeatureWriter(AbstractFeatureWriter):
     def gsubType4(self, target, replacement):
         self._instructions.append(("gsub type 4", (target, replacement)))
 
-    def gsubType6(self, precedingContext, target, trailingContext, replacement):
-        self._instructions.append(("gsub type 6", (precedingContext, target, trailingContext, replacement)))
+    def gsubType6(self, precedingContext, target, trailingContext, replacement, ignore=False):
+        self._instructions.append(("gsub type 6", (precedingContext, target, trailingContext, replacement, ignore)))
 
     def gposType1(self, target, value):
         self._instructions.append(("gpos type 1", (target, value)))
-    
+
     def gposType2(self, target, value):
         self._instructions.append(("gpos type 2", (target, value)))
 
@@ -433,13 +433,12 @@ class TestRead(unittest.TestCase):
         self.assertEqual(result, expected)
 
     def testGSUBType6(self):
-        # ("gsub type 6", (precedingContext, target, trailingContext, replacement))
         test = """sub f o' by o.alt;"""
         writer = TestFeatureWriter()
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("gsub type 6", (["f"], ["o"], [], "o.alt"))
+                ("gsub type 6", (["f"], ["o"], [], "o.alt", False))
                 ]
         self.assertEqual(result, expected)
         #
@@ -448,7 +447,7 @@ class TestRead(unittest.TestCase):
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("gsub type 6", (["f"], ["o"], ["o"], "o.alt"))
+                ("gsub type 6", (["f"], ["o"], ["o"], "o.alt", False))
                 ]
         self.assertEqual(result, expected)
         #
@@ -457,7 +456,7 @@ class TestRead(unittest.TestCase):
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("gsub type 6", (["f"], ["o", "o"], [], "o_o.alt"))
+                ("gsub type 6", (["f"], ["o", "o"], [], "o_o.alt", False))
                 ]
         self.assertEqual(result, expected)
         #
@@ -466,7 +465,7 @@ class TestRead(unittest.TestCase):
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("gsub type 6", (["f"], ["o", "o"], ["b"], "o_o.alt"))
+                ("gsub type 6", (["f"], ["o", "o"], ["b"], "o_o.alt", False))
                 ]
         self.assertEqual(result, expected)
         #
@@ -476,7 +475,7 @@ class TestRead(unittest.TestCase):
         #parseFeatures(writer, test)
         #result = writer.getData()
         #expected = [
-        #        ("gsub type 6", ([["f"]], [["o"]], [["o"]], "o.alt"))
+        #        ("gsub type 6", ([["f"]], [["o"]], [["o"]], "o.alt", False))
         #        ]
         #self.assertEqual(result, expected)
         ##
@@ -486,7 +485,54 @@ class TestRead(unittest.TestCase):
         parseFeatures(writer, test)
         result = writer.getData()
         expected = [
-                ("gsub type 6", ([], [["foo", "bar"]], ["bar"], ["foo.alt", "bar.alt"]))
+                ("gsub type 6", ([], [["foo", "bar"]], ["bar"], ["foo.alt", "bar.alt"], False))
+                ]
+        self.assertEqual(result, expected)
+
+    def testIgnoreGSUBType6(self):
+        # ("gsub type 6", (precedingContext, target, trailingContext, replacement))
+        test = """ignore sub f o';"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("gsub type 6", (["f"], ["o"], [], None, True))
+                ]
+        self.assertEqual(result, expected)
+        #
+        test = """ignore sub f o' o;"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("gsub type 6", (["f"], ["o"], ["o"], None, True))
+                ]
+        self.assertEqual(result, expected)
+        #
+        test = """ignore sub f o' o';"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("gsub type 6", (["f"], ["o", "o"], [], None, True))
+                ]
+        self.assertEqual(result, expected)
+        #
+        test = """ignore sub f o' o' b;"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("gsub type 6", (["f"], ["o", "o"], ["b"], None, True))
+                ]
+        self.assertEqual(result, expected)
+        #
+        test = """ignore sub [foo bar]' bar;"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("gsub type 6", ([], [["foo", "bar"]], ["bar"], None, True))
                 ]
         self.assertEqual(result, expected)
 

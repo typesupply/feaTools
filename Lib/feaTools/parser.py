@@ -134,6 +134,14 @@ subType3RE = re.compile(
         "\s*;"                 # ;
         )
 
+# used for finding all ignore substitution type 6
+ignoreSubType6RE = re.compile(
+        "([\s;\{\}]|^)"                          # whitepace, ; {, } or start of line
+        "ignore\s+substitute|ignore\s+sub\s+"    # ignore sub
+        "([\w\d\s_.@\[\]']+)"                    # preceding context, target, trailing context
+        "\s*;"                                   # ;
+        )
+
 # used for finding all substitution type 6
 # XXX see failing unit test
 subType6RE = re.compile(
@@ -317,6 +325,11 @@ def _parseUnknown(writer, text):
     for precedingMark, target, replacement in subType6s:
         text = _executeSimpleSlice(precedingMark, text, subType6RE, writer)
         _parseSubType6(writer, target, replacement)
+    # ignore sub type 6
+    ignoreSubType6s = ignoreSubType6RE.findall(text)
+    for precedingMark, target in ignoreSubType6s:
+        text = _executeSimpleSlice(precedingMark, text, ignoreSubType6RE, writer)
+        _parseSubType6(writer, target, replacement=None, ignore=True)
     ## extract positions
     # pos type 1
     posType1s = posType1RE.findall(text)
@@ -437,13 +450,18 @@ def _parseSubType3(writer, target, replacement):
     replacement = classContentRE.findall(replacement)
     writer.gsubType3(target, replacement)
 
-def _parseSubType6(writer, target, replacement):
+def _parseSubType6(writer, target, replacement=None, ignore=False):
     # replacement will always be one item.
     # either a single glyph/class or a list
-    # reresenting an inline class.
-    replacement = classContentRE.findall(replacement)
-    if len(replacement) == 1:
-        replacement = replacement[0]
+    # representing an inline class.
+    # the only exception to this is if
+    # this is an ignore substitution.
+    # in that case, replacement will
+    # be None.
+    if not ignore:
+        replacement = classContentRE.findall(replacement)
+        if len(replacement) == 1:
+            replacement = replacement[0]
     #
     targetText = target
     #
@@ -469,7 +487,7 @@ def _parseSubType6(writer, target, replacement):
         extractedTargets.append(target)
         counter += 1
         targetText = targetText[end:]
-    writer.gsubType6(precedingContext, extractedTargets, trailingContext, replacement)
+    writer.gsubType6(precedingContext, extractedTargets, trailingContext, replacement, ignore=ignore)
 
 def _parsePosType1(writer, target, value):
     # target will only be one item representing

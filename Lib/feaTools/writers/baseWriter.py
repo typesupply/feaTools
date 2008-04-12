@@ -24,7 +24,7 @@ class AbstractFeatureWriter(object):
     def gsubType4(self, target, replacement):
         raise NotImplementedError
 
-    def gsubType6(self, precedingContext, target, trailingContext, replacement):
+    def gsubType6(self, precedingContext, target, trailingContext, replacement, ignore=False):
         raise NotImplementedError
 
     def gposType1(self, target, value):
