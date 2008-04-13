@@ -27,6 +27,9 @@ class TestFeatureWriter(AbstractFeatureWriter):
         token, obj = self._instructions[-1]
         return obj
 
+    def table(self, name, data):
+        self._instructions.append(("table", (name, data)))
+
     def classDefinition(self, name, contents):
         self._instructions.append(("class", (name, contents)))
 
@@ -224,14 +227,90 @@ class TestRead(unittest.TestCase):
         self.assertEqual(result, expected)
         #
         test = """
-        table test {
-            feature TEST {} TEST;
-        } test;
+        table OS/2 {
+            FSType 0;
+            Panose 0 1 2 3 4 5 6 7 8 9;
+            UnicodeRange 0 1 2 3 4 5;
+            CodePageRange 0 1 2 3 4 5;
+            TypoAscender 750;
+            TypoDescender -250;
+            TypoLineGap 200;
+            winAscent 750;
+            winDescent -250;
+            XHeight 400;
+            CapHeight 750;
+            WeightClass 500;
+            WidthClass 3;
+            Vendor "test";
+        } OS/2;
         """
         writer = TestFeatureWriter()
         parseFeatures(writer, test)
         result = writer.getData()
-        expected = []
+        expected = [("table", ("OS/2", [
+            ("FSType", 0),
+            ("Panose", [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
+            ("UnicodeRange", [0, 1, 2, 3, 4, 5]),
+            ("CodePageRange", [0, 1, 2, 3, 4, 5]),
+            ("TypoAscender", 750.0),
+            ("TypoDescender", -250.0),
+            ("TypoLineGap", 200.0),
+            ("winAscent", 750.0),
+            ("winDescent", -250.0),
+            ("XHeight", 400.0),
+            ("CapHeight", 750.0),
+            ("WeightClass", 500.0),
+            ("WidthClass", 3.0)
+        ]))]
+        self.assertEqual(result, expected)
+        #
+        test = """
+        table head {
+            FontRevision 1.1;
+        } head;
+        """
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [("table", ("head", [
+            ("FontRevision", 1.1),
+        ]))]
+        self.assertEqual(result, expected)
+        #
+        test = """
+        table hhea {
+            CaretOffset 1;
+            Ascender 2;
+            Descender 3;
+            LineGap 4;
+        } hhea;
+        """
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [("table", ("hhea", [
+            ("CaretOffset", 1),
+            ("Ascender", 2),
+            ("Descender", 3),
+            ("LineGap", 4),
+        ]))]
+        self.assertEqual(result, expected)
+        #
+        test = """
+        table vhea {
+            VertTypoAscender 2;
+            VertTypoDescender 3;
+            VertTypoLineGap 4;
+        } vhea;
+        """
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [("table", ("vhea", [
+            ("VertTypoAscender", 2.0),
+            ("VertTypoDescender", 3.0),
+            ("VertTypoLineGap", 4.0),
+        ]))]
         self.assertEqual(result, expected)
 
     def testLookupFlag(self):

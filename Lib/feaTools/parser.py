@@ -71,7 +71,7 @@ lookupContentRE = [
 table_findAll_RE = re.compile(
         "([\s;\{\}]|^)"        # whitepace, ; {, } or start of line
         "table\s+"             # table
-        "([\w\d]{4})"          # name
+        "([\w\d/]+)"        # name
         "\s*{"                 # {
         )
 
@@ -88,6 +88,14 @@ tableContentRE = [
         # table name           # name
         "\s*;"                 # ;
         ]
+
+# used for getting tag value pairs from tables.
+tableTagValueRE = re.compile(
+    "([\w\d_.]+)"       # tag
+    "\s+"               #
+    "([^;]+)"           # anything but ;
+    ";"                 # ;
+)
 
 # used for finding all class definitions.
 classDefinitionRE = re.compile(
@@ -416,9 +424,76 @@ def _parseLookup(writer, name, lookup):
     parsed = _parseUnknown(lookupWriter, lookup)
 
 def _parseTable(writer, name, table):
-    # this could parse table secific data.
-    # for now, simply ignore the text.
-    pass
+    tagValueTables = ["head", "hhea", "OS/2", "vhea"]
+    # skip unknown tables
+    if name not in tagValueTables:
+        return
+    _parseTagValueTable(writer, name, table)
+
+def _parseTagValueTable(writer, name, table):
+    valueTypes = {
+        "head" : {
+            "FontRevision" : float
+        },
+        "hhea" : {
+            "CaretOffset" : float,
+            "Ascender"    : float,
+            "Descender"   : float,
+            "LineGap"     : float,
+        },
+        "OS/2" : {
+            "FSType"        : int,
+            "Panose"        : "listOfInts",
+            "UnicodeRange"  : "listOfInts",
+            "CodePageRange" : "listOfInts",
+            "TypoAscender"  : float,
+            "TypoDescender" : float,
+            "TypoLineGap"   : float,
+            "winAscent"     : float,
+            "winDescent"    : float,
+            "XHeight"       : float,
+            "CapHeight"     : float,
+            "WeightClass"   : float,
+            "WidthClass"    : float,
+            "Vendor"        : str
+        },
+        "vhea" : {
+            "VertTypoAscender"  : float,
+            "VertTypoDescender" : float,
+            "VertTypoLineGap"   : float
+        }
+    }
+    tableTypes = valueTypes[name]
+    parsedTagValues = []
+    for tag, value in tableTagValueRE.findall(table):
+        tag = tag.strip()
+        value = value.strip()
+        if tag not in tableTypes:
+            raise FeaToolsParserSyntaxError("Unknown Tag: %s" % tag)
+        desiredType = tableTypes[tag]
+        if desiredType == "listOfInts":
+            v = []
+            for line in value.splitlines():
+                for i in line.split():
+                    v.append(i)
+            value = v
+            values = []
+            for i in value:
+                try:
+                    i = int(i)
+                    values.append(i)
+                except ValueError:
+                    raise FeaToolsParserSyntaxError("Invalid Syntax: %s" % i)
+            value = values
+        elif desiredType == str:
+            raise NotImplementedError
+        elif not isinstance(value, desiredType):
+            try:
+                value = desiredType(value)
+            except ValueError:
+                raise FeaToolsParserSyntaxError("Invalid Syntax: %s" % i)
+        parsedTagValues.append((tag, value))
+    writer.table(name, parsedTagValues)
 
 def _parseClass(writer, name, content):
     content = classContentRE.findall(content)

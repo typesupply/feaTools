@@ -6,6 +6,9 @@ class AbstractFeatureWriter(object):
     def lookup(self, name):
         return self
 
+    def table(self, name, data):
+        pass
+
     def featureReference(self, name):
         pass
 
