@@ -177,7 +177,7 @@ class FDKSyntaxFeatureWriter(AbstractFeatureWriter):
         self._instructions.append(t)
 
     def language(self, languageTag, includeDefault=True):
-        if not includeDefault:
+        if not includeDefault and languageTag != "dflt":
             t = "language %s exclude_dflt;" % languageTag
         else:
             t = "language %s;" % languageTag
