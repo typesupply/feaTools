@@ -191,3 +191,6 @@ class FDKSyntaxFeatureWriter(AbstractFeatureWriter):
         t = "subtable;"
         self._instructions.append(t)
 
+    def rawText(self, text):
+        self._instructions.append(text)
+
