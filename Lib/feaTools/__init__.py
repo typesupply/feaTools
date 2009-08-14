@@ -51,16 +51,12 @@ Parser:
   make no distincition about precede, target and trail
   (context, target, context, target, context, ...)
   ([], [f], [o, o], [b], [a, r])
-- ignore
-- lookupflag
+- lookupflag format b - how are the numbers calculated?
 - useExtension
 - check on dflt
 - future gpos formats
-- table (complex!)
 - size
 - ranges for class definition
-- anon
-- enum pos type 2
 - need to throw up a meaningful error for bad syntax
 
 Writer:

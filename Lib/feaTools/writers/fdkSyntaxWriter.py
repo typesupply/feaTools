@@ -121,8 +121,14 @@ class FDKSyntaxFeatureWriter(AbstractFeatureWriter):
         if isinstance(precedingContext, list):
             precedingContext = self._list2String(precedingContext)
         if isinstance(target, list):
-            target = self._list2String(target)
-        target += "'"
+            finalTarget = []
+            for t in target:
+                if isinstance(t, list):
+                    t = "[%s]" % self._list2String(t)
+                finalTarget.append(t + "'")
+            target = " ".join(finalTarget)
+        else:
+            target += "'"
         if isinstance(trailingContext, list):
             trailingContext = self._list2String(trailingContext)
         if isinstance(replacement, list):
