@@ -78,6 +78,14 @@ class TestFeatureWriter(AbstractFeatureWriter):
 
 class TestRead(unittest.TestCase):
 
+    def testLanguageSystem(self):
+        test = "languagesystem DFLT dflt;"
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [('language system', ('dflt', 'DFLT'))]
+        self.assertEqual(result, expected)
+
     def testStrings(self):
         test = """
             "feature test { sub foo by bar; } test;"

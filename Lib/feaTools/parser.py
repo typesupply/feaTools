@@ -362,7 +362,7 @@ def _parseUnknown(writer, text):
     languagesystems = languagesystemRE.findall(text)
     for precedingMark, scriptTag, languageTag in languagesystems:
         text = _executeSimpleSlice(precedingMark, text, languagesystemRE, writer)
-        writer.languageSystem(scriptTag, languageTag)
+        writer.languageSystem(languageTag, scriptTag)
     # script
     scripts = scriptRE.findall(text)
     for precedingMark, scriptTag in scripts:
