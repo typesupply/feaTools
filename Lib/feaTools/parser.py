@@ -401,6 +401,11 @@ def _parseUnknown(writer, text):
     for precedingMark in subtables:
         text = _executeSimpleSlice(precedingMark, text, subtableRE, writer)
         writer.subtableBreak()
+    # empty instructions
+    terminators = terminatorRE.findall(text)
+    for terminator in terminators:
+        text = _executeSimpleSlice(None, text, terminatorRE, writer)
+        writer.rawText(terminator)
     text = text.strip()
     if text:
         raise FeaToolsParserSyntaxError("Invalid Syntax: %s" % text)
