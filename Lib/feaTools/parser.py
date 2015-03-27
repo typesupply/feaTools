@@ -429,7 +429,7 @@ def _parseLookup(writer, name, lookup):
     parsed = _parseUnknown(lookupWriter, lookup)
 
 def _parseTable(writer, name, table):
-    tagValueTables = ["head", "hhea", "OS/2", "vhea"]
+    tagValueTables = ["GDEF", "head", "hhea", "OS/2", "vhea"]
     # skip unknown tables
     if name not in tagValueTables:
         return
@@ -437,6 +437,9 @@ def _parseTable(writer, name, table):
 
 def _parseTagValueTable(writer, name, table):
     valueTypes = {
+        "GDEF" : {
+            "GlyphClassDef" : str
+        },
         "head" : {
             "FontRevision" : float
         },
@@ -490,8 +493,6 @@ def _parseTagValueTable(writer, name, table):
                 except ValueError:
                     raise FeaToolsParserSyntaxError("Invalid Syntax: %s" % i)
             value = values
-        elif desiredType == str:
-            raise NotImplementedError
         elif not isinstance(value, desiredType):
             try:
                 value = desiredType(value)
