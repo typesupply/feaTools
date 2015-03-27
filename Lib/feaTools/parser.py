@@ -513,6 +513,11 @@ def _parseSequence(sequence):
         precedingText = sequence[:start]
         parsed.extend(_parseSequence(precedingText))
         parsed.append(_parseSequence(content))
+
+        # store contextual marking in the class's reference list
+        if sequence[end - 1] == "'":
+            parsed[-1].append("'")
+
         sequence = sequence[end:]
     content = [i for i in sequence.split(" ") if i]
     parsed.extend(content)
