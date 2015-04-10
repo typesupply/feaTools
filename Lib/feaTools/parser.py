@@ -354,7 +354,7 @@ def _parseUnknown(writer, text):
     posType2s = posType2RE.findall(text)
     for precedingMark, enumTag, posTag, targetAndValue in posType2s:
         text = _executeSimpleSlice(precedingMark, text, posType2RE, writer)
-        _parsePosType2(writer, targetAndValue)
+        _parsePosType2(writer, targetAndValue, needEnum=enumTag.strip())
     ## extract other data
     # XXX look at FDK spec. sometimes a language tag of dflt will be passed
     # it should be handled differently than the other tags.
@@ -592,7 +592,7 @@ def _parsePosType1(writer, target, value):
     value = tuple([float(i) for i in value.strip().split(" ")])
     writer.gposType1(target, value)
 
-def _parsePosType2(writer, targetAndValue):
+def _parsePosType2(writer, targetAndValue, needEnum=False):
     # the target and value will be coming
     # in as single string.
     target = " ".join(targetAndValue.split(" ")[:-1])
@@ -600,17 +600,7 @@ def _parsePosType2(writer, targetAndValue):
     # XXX this could cause a choke
     value = float(value)
     target = _parseSequence(target)
-    writer.gposType2(target, value)
-
-def _parsePosType2WithEnum(writer, targetAndValue):
-    # the target and value will be coming
-    # in as single string.
-    target = " ".join(targetAndValue.split(" ")[:-1])
-    value = targetAndValue.split(" ")[-1]
-    # XXX this could cause a choke
-    value = float(value)
-    target = _parseSequence(target)
-    writer.gposType2(target, value)
+    writer.gposType2(target, value, needEnum)
 
 def _parseLookupFlag(writer, values):
     values = values.replace(",", " ")
