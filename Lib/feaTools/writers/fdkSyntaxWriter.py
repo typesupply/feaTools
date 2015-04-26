@@ -46,7 +46,13 @@ class FDKSyntaxFeatureWriter(AbstractFeatureWriter):
         final = []
         for i in aList:
             if isinstance(i, list):
-                i = "[%s]" % self._list2String(i)
+
+                # handle classes marked for contextual rules
+                if i[-1] == "'":
+                    i = "[%s]'" % self._list2String(i[:-1])
+
+                else:
+                    i = "[%s]" % self._list2String(i)
             final.append(i)
         return " ".join(final)
 
@@ -160,15 +166,12 @@ class FDKSyntaxFeatureWriter(AbstractFeatureWriter):
         t = "pos %s <%s>;" % (target, value)
         self._instructions.append(t)
 
-    def gposType2(self, target, value):
-        needEnum = False
+    def gposType2(self, target, value, needEnum=False):
         left, right = target
         if isinstance(left, list):
             left = "[%s]" % self._list2String(left)
-            needEnum = True
         if isinstance(right, list):
             right = "[%s]" % self._list2String(right)
-            needEnum = True
         t = "pos %s %s %d;" % (left, right, value)
         if needEnum:
             t = "enum %s" % t
