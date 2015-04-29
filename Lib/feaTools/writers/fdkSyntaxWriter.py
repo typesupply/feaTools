@@ -46,13 +46,7 @@ class FDKSyntaxFeatureWriter(AbstractFeatureWriter):
         final = []
         for i in aList:
             if isinstance(i, list):
-
-                # handle classes marked for contextual rules
-                if i[-1] == "'":
-                    i = "[%s]'" % self._list2String(i[:-1])
-
-                else:
-                    i = "[%s]" % self._list2String(i)
+                i = "[%s]" % self._list2String(i)
             final.append(i)
         return " ".join(final)
 
