@@ -39,7 +39,7 @@ featureContentRE = [
         "feature\s+",          # feature
         # feature name         # name
         "\s*\{",               # {
-        "([\S\s]*)",           # content
+        "([\S\s]*?)",          # content
         "}\s*",                # }
         # feature name         # name
         "\s*;"                 # ;
@@ -61,7 +61,7 @@ lookupContentRE = [
         "lookup\s+",           # lookup
         # lookup name          # name
         "\s*\{",               # {
-        "([\S\s]*)",           # content
+        "([\S\s]*?)",          # content
         "}\s*",                # }
         # lookup name          # name
         "\s*;"                 # ;
@@ -83,7 +83,7 @@ tableContentRE = [
         "table\s+",            # feature
         # table name           # name
         "\s*\{",               # {
-        "([\S\s]*)",           # content
+        "([\S\s]*?)",          # content
         "}\s*",                # }
         # table name           # name
         "\s*;"                 # ;
@@ -104,7 +104,7 @@ classDefinitionRE = re.compile(
         "([\w\d_.]+)"          # name
         "\s*=\s*"              #  = 
         "\["                   # [
-        "([\w\d\s_.@]+)"       # content
+        "([\w\d\s\-_.@]+)"     # content
         "\]"                   # ]
         "\s*;"                 # ;
         , re.M
@@ -112,7 +112,7 @@ classDefinitionRE = re.compile(
 
 # used for getting the contents of a class definition
 classContentRE = re.compile(
-        "([\w\d_.@]+)"
+        "([\w\d\-_.@]+)"
         )
 
 # used for finding inline classes within a sequence
@@ -513,11 +513,6 @@ def _parseSequence(sequence):
         precedingText = sequence[:start]
         parsed.extend(_parseSequence(precedingText))
         parsed.append(_parseSequence(content))
-
-        # store contextual marking in the class's reference list
-        if sequence[end - 1] == "'":
-            parsed[-1].append("'")
-
         sequence = sequence[end:]
     content = [i for i in sequence.split(" ") if i]
     parsed.extend(content)
