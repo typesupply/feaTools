@@ -52,7 +52,7 @@ class TestFeatureWriter(AbstractFeatureWriter):
     def gposType1(self, target, value):
         self._instructions.append(("gpos type 1", (target, value)))
 
-    def gposType2(self, target, value):
+    def gposType2(self, target, value, needEnum=False):
         self._instructions.append(("gpos type 2", (target, value)))
 
     def languageSystem(self, languageTag, scriptTag):
