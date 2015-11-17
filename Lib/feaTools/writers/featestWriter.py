@@ -2,7 +2,8 @@
 Experimental .featest writer.
 """
 
-from baseWriter import AbstractFeatureWriter
+from __future__ import print_function, division, absolute_import, unicode_literals
+from .baseWriter import AbstractFeatureWriter
 
 
 class FeatestWriter(object):
