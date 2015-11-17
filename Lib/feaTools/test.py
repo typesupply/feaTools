@@ -1,6 +1,7 @@
+from __future__ import print_function, division, absolute_import, unicode_literals
 import unittest
-from parser import parseFeatures
-from writers.baseWriter import AbstractFeatureWriter
+from .parser import parseFeatures
+from .writers.baseWriter import AbstractFeatureWriter
 
 
 class TestFeatureWriter(AbstractFeatureWriter):
