@@ -261,6 +261,14 @@ lookupflagRE = re.compile(
         "\s*;"                 # ;
         )
 
+# used for finding all stylistic set featureNames.
+featureNamesRE = re.compile(
+        "([\s;\{\}]|^)"        # whitepace, ; {, } or start of line
+        "featureNames"         # featureNames
+        "[\S\s]*?}\s*;"        # everything up until }; with whitespace
+        )
+
+
 def _parseUnknown(writer, text):
     text = text.strip()
     ## extract all table names
@@ -282,13 +290,13 @@ def _parseUnknown(writer, text):
         _parseTable(writer, tableName, tableText)
         text = text[end:]
     ## extract all feature names
-    featureNames = feature_findAll_RE.findall(text)
-    for precedingMark, featureName in featureNames:
+    featureTags = feature_findAll_RE.findall(text)
+    for precedingMark, featureTag in featureTags:
         # a regular expression specific to this lookup must
         # be created so that nested lookups are safely handled
         thisFeatureContentRE = list(featureContentRE)
-        thisFeatureContentRE.insert(2, featureName)
-        thisFeatureContentRE.insert(6, featureName)
+        thisFeatureContentRE.insert(2, featureTag)
+        thisFeatureContentRE.insert(6, featureTag)
         thisFeatureContentRE = re.compile("".join(thisFeatureContentRE))
         found = thisFeatureContentRE.search(text)
         featureText = found.group(2)
@@ -297,7 +305,7 @@ def _parseUnknown(writer, text):
         if precedingMark:
             precedingText += precedingMark
         _parseUnknown(writer, precedingText)
-        _parseFeature(writer, featureName, featureText)
+        _parseFeature(writer, featureTag, featureText)
         text = text[end:]
     ## extract all lookup names
     lookupNames = lookup_findAll_RE.findall(text)
@@ -383,9 +391,9 @@ def _parseUnknown(writer, text):
         writer.include(path)
     # feature reference
     featureReferences = featureReferenceRE.findall(text)
-    for precedingMark, featureName in featureReferences:
+    for precedingMark, featureTag in featureReferences:
         text = _executeSimpleSlice(precedingMark, text, featureReferenceRE, writer)
-        writer.featureReference(featureName)
+        writer.featureReference(featureTag)
     # lookup reference
     lookupReferences = lookupReferenceRE.findall(text)
     for precedingMark, lookupName in lookupReferences:
@@ -401,6 +409,10 @@ def _parseUnknown(writer, text):
     for precedingMark in subtables:
         text = _executeSimpleSlice(precedingMark, text, subtableRE, writer)
         writer.subtableBreak()
+    ## extract all featureNames
+    featureNames = featureNamesRE.findall(text)
+    for precedingMark in featureNames:
+        text = _executeSimpleSlice(precedingMark, text, featureNamesRE, writer)
     # empty instructions
     terminators = terminatorRE.findall(text)
     for terminator in terminators:
