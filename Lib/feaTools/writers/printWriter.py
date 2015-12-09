@@ -39,7 +39,7 @@ class PrintFeatureWriter(AbstractFeatureWriter):
     def gposType1(self, target, value):
         print ("gpos type 1", (target, value))
 
-    def gposType2(self, target, value):
+    def gposType2(self, target, value, needEnum=False):
         print ("gpos type 2", (target, value))
 
     def languageSystem(self, languageTag, scriptTag):
