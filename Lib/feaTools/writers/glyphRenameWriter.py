@@ -54,6 +54,6 @@ class GlyphRenameFeatureWriter(FDKSyntaxFeatureWriter):
         target = self._rename(target)
         super(GlyphRenameFeatureWriter, self).gposType1(target, value)
 
-    def gposType2(self, target, value):
+    def gposType2(self, target, value, needEnum=False):
         target = self._rename(target)
         super(GlyphRenameFeatureWriter, self).gposType2(target, value)
