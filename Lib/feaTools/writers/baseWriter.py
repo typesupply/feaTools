@@ -36,7 +36,7 @@ class AbstractFeatureWriter(object):
     def gposType1(self, target, value):
         pass
 
-    def gposType2(self, target, value):
+    def gposType2(self, target, value, needEnum=False):
         pass
 
     def languageSystem(self, languageTag, scriptTag):

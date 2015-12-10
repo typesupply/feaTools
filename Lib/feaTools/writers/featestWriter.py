@@ -80,7 +80,7 @@ class FeatestWriter(object):
     def gposType1(self, target, value):
         raise NotImplementedError
 
-    def gposType2(self, target, value):
+    def gposType2(self, target, value, needEnum=False):
         raise NotImplementedError
 
     def languageSystem(self, languageTag, scriptTag):
