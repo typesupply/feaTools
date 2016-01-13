@@ -1,6 +1,7 @@
+from __future__ import print_function, division, absolute_import, unicode_literals
 import unittest
-from parser import parseFeatures
-from writers.baseWriter import AbstractFeatureWriter
+from .parser import parseFeatures
+from .writers.baseWriter import AbstractFeatureWriter
 
 
 class TestFeatureWriter(AbstractFeatureWriter):
@@ -51,7 +52,7 @@ class TestFeatureWriter(AbstractFeatureWriter):
     def gposType1(self, target, value):
         self._instructions.append(("gpos type 1", (target, value)))
 
-    def gposType2(self, target, value):
+    def gposType2(self, target, value, needEnum=False):
         self._instructions.append(("gpos type 2", (target, value)))
 
     def languageSystem(self, languageTag, scriptTag):

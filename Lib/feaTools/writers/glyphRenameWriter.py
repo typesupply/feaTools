@@ -4,8 +4,14 @@ To rename glyphs, pass a dictionary of {beforeName:afterName} as the
 remap argument in the constructor.
 """
 
-from baseWriter import AbstractFeatureWriter
-from fdkSyntaxWriter import FDKSyntaxFeatureWriter
+from __future__ import print_function, division, absolute_import, unicode_literals
+from .fdkSyntaxWriter import FDKSyntaxFeatureWriter
+
+
+try:
+    basestring
+except NameError:
+    basestring = str
 
 
 class GlyphRenameFeatureWriter(FDKSyntaxFeatureWriter):
