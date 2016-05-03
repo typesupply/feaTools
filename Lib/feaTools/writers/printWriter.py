@@ -28,6 +28,9 @@ class PrintFeatureWriter(AbstractFeatureWriter):
     def gsubType1(self, target, replacement):
         print(("gsub type 1", (target, replacement)))
 
+    def gsubType2(self, target, replacement):
+        print(("gsub type 1", (target, replacement)))
+
     def gsubType3(self, target, replacement):
         print(("gsub type 3", (target, replacement)))
 

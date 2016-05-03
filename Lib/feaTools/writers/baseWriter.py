@@ -24,6 +24,9 @@ class AbstractFeatureWriter(object):
     def gsubType1(self, target, replacement):
         pass
 
+    def gsubType2(self, target, replacement):
+        pass
+
     def gsubType3(self, target, replacement):
         pass
 

@@ -124,7 +124,7 @@ sequenceInlineClassRE = re.compile(
         )
 
 # used for finding all substitution type 1
-subType1And4RE = re.compile(
+subType1And2And4RE = re.compile(
         "([\s;\{\}]|^)"        # whitepace, ; {, } or start of line
         "substitute|sub\s+"    # sub
         "([\w\d\s_.@\[\]]+)"   # target
@@ -334,10 +334,10 @@ def _parseUnknown(writer, text):
         _parseClass(writer, className, classContent)
     ## extract substitutions
     # sub type 1 and 4
-    subType1s = subType1And4RE.findall(text)
+    subType1s = subType1And2And4RE.findall(text)
     for precedingMark, target, replacement in subType1s:
-        text = _executeSimpleSlice(precedingMark, text, subType1And4RE, writer)
-        _parseSubType1And4(writer, target, replacement)
+        text = _executeSimpleSlice(precedingMark, text, subType1And2And4RE, writer)
+        _parseSubType1And2And4(writer, target, replacement)
     # sub type 3
     subType3s = subType3RE.findall(text)
     for precedingMark, target, replacement in subType3s:
@@ -531,21 +531,27 @@ def _parseSequence(sequence):
     parsed.extend(content)
     return parsed
 
-def _parseSubType1And4(writer, target, replacement):
+def _parseSubType1And2And4(writer, target, replacement):
     target = _parseSequence(target)
-    # replacement will always be one item.
-    # either a single glyph/class or a list
-    # reresenting an inline class.
     replacement = _parseSequence(replacement)
-    replacement = replacement[0]
-    if len(target) == 1:
+    if len(target) > 1 and len(replacement) > 1:
+        raise FeaToolsParserSyntaxError("many to many replacement are not allowed")
+    if len(target) == 1 and len(replacement) == 1:
+        # replacement will always be one item.
+        # either a single glyph/class or a list
+        # reresenting an inline class.
         target = target[0]
+        replacement = replacement[0]
         writer.gsubType1(target, replacement)
-    else:
+    elif len(replacement) == 1:
         # target will always be a list representing a sequence.
         # the list may contain strings representing a single
         # glyph/class or a list representing an inline class.
+        replacement = replacement[0]
         writer.gsubType4(target, replacement)
+    else:
+        target = target[0]
+        writer.gsubType2(target, replacement)
 
 def _parseSubType3(writer, target, replacement):
     # target will only be one item representing

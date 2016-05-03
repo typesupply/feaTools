@@ -40,6 +40,9 @@ class TestFeatureWriter(AbstractFeatureWriter):
     def gsubType1(self, target, replacement):
         self._instructions.append(("gsub type 1", (target, replacement)))
 
+    def gsubType2(self, target, replacement):
+        self._instructions.append(("gsub type 2", (target, replacement)))
+
     def gsubType3(self, target, replacement):
         self._instructions.append(("gsub type 3", (target, replacement)))
 
@@ -452,6 +455,76 @@ class TestRead(unittest.TestCase):
                 ("feature", ("test", [
                 ("gsub type 1", ("foo1", "bar1")),
                 ("gsub type 1", ("foo2", "bar2"))
+                ]))
+                ]
+        self.assertEqual(result, expected)
+
+    def testGSUBType2(self):
+        test = """sub f_o_o by f o o;"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("gsub type 2", ("f_o_o", ["f", "o", "o"]))
+                ]
+        self.assertEqual(result, expected)
+        #
+        test = """sub f_o_o by [f] o o;"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("gsub type 2", ("f_o_o", [["f"], "o", "o"]))
+                ]
+        self.assertEqual(result, expected)
+        #
+        test = """sub f_o_o by @f o o;"""
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("gsub type 2", ("f_o_o", ["@f", "o", "o"]))
+                ]
+        self.assertEqual(result, expected)
+        #
+        test = """
+        sub f_o_o by f o o;
+        sub b_a_r by b a r;
+        """
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("gsub type 2", ("f_o_o", ["f", "o", "o"])),
+                ("gsub type 2", ("b_a_r", ["b", "a", "r"]))
+                ]
+        self.assertEqual(result, expected)
+        #
+        test = """
+        feature test {
+            sub f_o_o by f o o;
+        } test;
+        """
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("feature", ("test", [
+                ("gsub type 2", ("f_o_o", ["f", "o", "o"]))
+                ]))
+                ]
+        self.assertEqual(result, expected)
+        #
+        test = """
+        feature test {sub f_o_o by f o o;sub b_a_r by b a r;} test;
+        """
+        writer = TestFeatureWriter()
+        parseFeatures(writer, test)
+        result = writer.getData()
+        expected = [
+                ("feature", ("test", [
+                ("gsub type 2", ("f_o_o", ["f", "o", "o"])),
+                ("gsub type 2", ("b_a_r", ["b", "a", "r"]))
                 ]))
                 ]
         self.assertEqual(result, expected)
