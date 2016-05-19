@@ -101,6 +101,9 @@ class FDKSyntaxFeatureWriter(AbstractFeatureWriter):
         t = "sub %s by %s;" % (target, replacement)
         self._instructions.append(t)
 
+    def gsubType2(self, target, replacement):
+        gsubType4(target, replacement)
+
     def gsubType3(self, target, replacement):
         if isinstance(target, list):
             target = "[%s]" % self._list2String(target)
